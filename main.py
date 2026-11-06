@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sys
 import threading
+import time
 from collections import deque
 
 import cv2
@@ -53,6 +54,7 @@ class MainWindow(QMainWindow):
         self.last_capture_signature = None
         self.board: Board | None = None
         self.frame_history = deque(maxlen=4)
+        self.last_analysis_at = 0.0
 
         root = QWidget()
         outer = QVBoxLayout(root)
@@ -127,7 +129,15 @@ class MainWindow(QMainWindow):
         # Avoid re-running the contour detector on every frame. The reveal usually
         # remains stable across multiple samples; process about 4 frames/second.
         self.frame_history.append(frame)
-        if len(self.frame_history) < 2 or self.board and self.board.complete:
+        now = time.monotonic()
+        if now - self.last_analysis_at < 0.24 or (self.board and self.board.complete):
+            return
+        self.last_analysis_at = now
+        # OCR verifies the MAPLE MINIGAME header when Tesseract is available.
+        # If OCR is unavailable, image-grid detection remains usable as a fallback.
+        header_found = recognize_minigame_text(frame)
+        if header_found is False:
+            self.status.setText('MapleStory detected · waiting for MAPLE MINIGAME…')
             return
         board = detect_board(frame)
         if board is None:
