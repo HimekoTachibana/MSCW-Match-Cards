@@ -5,9 +5,10 @@ All notable project updates are recorded here. Entries describe repository chang
 ## [Unreleased]
 
 ### Changed
-- Use the supplied 6×5 gameplay video as the reference for the board layout.
-- Document the 4×3 and 5×4 variants as sharing the same overall board region, with larger cards as the grid contains fewer rows and columns.
-- Scale the solver's result tiles according to the detected column count so the displayed board keeps a consistent overall width: 4×3 largest, 5×4 intermediate, and 6×5 smallest.
+- Set the [user-provided 6×5 gameplay video](https://www.youtube.com/watch?v=xqS7pS4uSZE) as the canonical visual reference for the Match Cards board.
+- Document the expected 4×3 and 5×4 layouts as using the same overall board area, with larger cards as the grid contains fewer rows and columns.
+- Keep the result view's card sizing proportional to the detected column count: 4×3 largest, 5×4 intermediate, and 6×5 smallest.
 
 ### Validation
-- Not yet run in this update. Windows gameplay calibration against the reference video remains outstanding.
+- Documentation updated; no automated tests or live Windows gameplay calibration were run for this documentation-only change.
+- Validate the board bounds, card spacing, and card dimensions against captures from all three modes before treating the layout assumptions as confirmed.
