@@ -12,7 +12,7 @@ A standalone Windows desktop helper that observes the visible MapleStory Classic
 
 Initial implementation scaffold. Screen/window discovery and image-based board recognition are implemented as a conservative MVP; game-specific layout calibration may be required for different resolutions or UI scaling.
 
-## Run (Windows 10/11)
+## Supported build targets\n\n- **Windows x64:** standalone folder packaged as a ZIP; tested on Windows 10/11.\n- **Linux x64:** standalone folder packaged as a tar.gz, built on Ubuntu 22.04 (glibc 2.35). Intended for Debian 12/13, current Fedora, Bazzite, Arch, and CachyOS systems with glibc 2.35 or newer. It is not a universal Linux package and is not guaranteed for Debian 11 or older.\n- Linux monitoring currently requires an **X11 session** and `wmctrl`. Wayland sessions are not supported yet. On Debian/Ubuntu install `wmctrl` and the Qt/XCB runtime libraries (`libxcb-cursor0`, `libxkbcommon-x11-0`, `libegl1`, `libgl1`); Fedora-family: `wmctrl libxcb xcb-util-cursor libxkbcommon-x11 mesa-libGL`; Arch-family: `wmctrl libxcb xcb-util-cursor libxkbcommon-x11 mesa`.\n\n## Build locally\n\nInstall requirements and PyInstaller, then run:\n\n```bash\npython -m pip install -r requirements.txt pyinstaller\npython -m unittest discover -s tests -v\npyinstaller --noconfirm --clean MSCW-Match-Card-Solver.spec\n```\n\nThe standalone folder is written to `dist/MSCW-Match-Card-Solver/`. The GitHub Actions workflow builds Windows and Linux x64 archives and publishes a prerelease for testing when this feature branch is updated. Linux builds use Ubuntu 22.04 as the compatibility baseline.\n\n## Run (Windows 10/11)
 
 ```powershell
 py -3.11 -m venv .venv
