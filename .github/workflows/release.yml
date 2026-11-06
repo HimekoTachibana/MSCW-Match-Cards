@@ -1,0 +1,75 @@
+name: Build and publish testing release
+
+on:
+  push:
+    branches:
+      - feature/match-card-solver
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            os: windows-latest
+            archive: MSCW-Match-Card-Solver-Windows-x64.zip
+          - platform: linux
+            os: ubuntu-22.04
+            archive: MSCW-Match-Card-Solver-Linux-x64.tar.gz
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-cursor0 libxkbcommon-x11-0 libegl1 libgl1 libx11-6 libxext6 libxrender1 libsm6 libice6 wmctrl
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Build standalone application
+        run: pyinstaller --noconfirm --clean MSCW-Match-Card-Solver.spec
+      - name: Package Windows build
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist/MSCW-Match-Card-Solver -DestinationPath ${{ matrix.archive }}
+      - name: Package Linux build
+        if: runner.os == 'Linux'
+        run: tar -C dist -czf "${{ matrix.archive }}" MSCW-Match-Card-Solver
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-x64
+          path: ${{ matrix.archive }}
+          if-no-files-found: error
+
+  publish-testing-release:
+    name: Publish prerelease
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Publish GitHub prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: testing-build-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: MSCW Match Card Solver - Testing Build ${{ github.run_number }}
+          prerelease: true
+          generate_release_notes: true
+          files: release-assets/*
