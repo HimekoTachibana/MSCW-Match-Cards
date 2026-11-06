@@ -34,7 +34,7 @@ class MonitorThread(QThread):
         self.wait(2000)
 
 
-def to_pixmap(bgr, max_width=112, max_height=126):
+def to_pixmap(bgr, max_width=140, max_height=158):
     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
     h, w, channels = rgb.shape
     qimage = QImage(rgb.data, w, h, channels * w, QImage.Format.Format_RGB888).copy()
@@ -157,6 +157,13 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
 
         by_position = {(c.row, c.col): c for c in board.cards}
+        # Keep a common board width across modes. Fewer columns therefore get
+        # proportionally larger cards, matching the in-game layout behavior.
+        spacing = 8
+        available_width = max(600, self.scroll.viewport().width() - 28)
+        tile_width = max(112, min(250, (available_width - spacing * (board.columns - 1)) // board.columns))
+        tile_height = int(tile_width * 1.13)
+        self.grid.setSpacing(spacing)
         for row in range(board.rows):
             for col in range(board.columns):
                 card = by_position.get((row, col))
@@ -167,9 +174,9 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(3, 3, 3, 3)
                 image = QLabel()
                 image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                image.setMinimumSize(104, 116)
+                image.setFixedSize(tile_width, tile_height)
                 if card:
-                    image.setPixmap(to_pixmap(card.image))
+                    image.setPixmap(to_pixmap(card.image, tile_width - 8, tile_height - 8))
                 else:
                     image.setText("Not\ncaptured")
                 layout.addWidget(image)
@@ -180,6 +187,7 @@ class MainWindow(QMainWindow):
                 label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 label.setStyleSheet("font-size: 10px; color: #475569;")
                 layout.addWidget(label)
+                cell.setFixedSize(tile_width + 10, tile_height + 34)
                 if not card:
                     cell.setStyleSheet("background: #fff7ed; border: 1px dashed #d97706;")
                 self.grid.addWidget(cell, row, col)
