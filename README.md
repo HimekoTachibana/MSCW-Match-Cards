@@ -30,9 +30,11 @@ Optional OCR: install Tesseract OCR and ensure `tesseract.exe` is on PATH. OCR i
 - **Clear results**: clears the current board and detected mode.
 - **Auto-detect**: looks for a regular grid of card-shaped regions and supports 4x3, 5x4, and 6x5 layouts.
 
-The initial reveal is time-limited. Keep the game window visible and unobstructed while the reveal is on screen. The app samples frames continuously and renders a candidate solution as soon as a complete grid is found. The 6×5 video example is the reference board layout; 4×3 and 5×4 use the same overall board region with larger cards and fewer rows/columns. The solver detects the active row/column count and the result view sizes cards to the same overall width, so 4×3 cards render largest, 5×4 cards medium, and 6×5 cards smallest.
+The initial reveal is time-limited. Keep the game window visible and unobstructed while the reveal is on screen. The app samples frames continuously and renders a candidate solution as soon as a complete grid is found.
 
-Reference gameplay example: [MapleStory Classic World Match Cards (6×5)](https://www.youtube.com/watch?v=uA3CNzwPw90).
+### Board layout reference
+
+The [user-provided 6×5 gameplay video](https://www.youtube.com/watch?v=xqS7pS4uSZE) is the visual reference for the largest supported grid. The 4×3 and 5×4 variants are expected to occupy the same overall board area, with fewer rows and columns and proportionally larger cards. The result view should preserve a consistent overall board footprint: 4×3 cards largest, 5×4 intermediate, and 6×5 smallest. These dimensions are a layout assumption to validate against actual captures from each mode, not a claim that all game resolutions are identical.
 
 ## Limitations
 
